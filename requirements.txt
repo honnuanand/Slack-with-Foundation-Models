@@ -1,0 +1,6 @@
+# Core dependencies (required for CLI)
+openai>=1.0.0
+python-dotenv>=1.0.0
+
+# Slack dependencies (only needed for app.py)
+slack-bolt>=1.18.0
