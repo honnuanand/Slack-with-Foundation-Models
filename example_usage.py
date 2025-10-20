@@ -22,12 +22,12 @@ messages = [
     {"role": "user", "content": "What is machine learning in simple terms?"}
 ]
 
-# Call Databricks Foundation Model (Maverick - Llama 3.1 70B)
-print("Calling Databricks Foundation Model: Maverick (Llama 3.1 70B)")
+# Call Databricks Foundation Model (Llama 4 Maverick)
+print("Calling Databricks Foundation Model: Llama 4 Maverick")
 print("-" * 60)
 
 response = client.chat.completions.create(
-    model="databricks-meta-llama-3-1-70b-instruct",
+    model="databricks-llama-4-maverick",
     messages=messages,
     max_tokens=500,
     temperature=0.7

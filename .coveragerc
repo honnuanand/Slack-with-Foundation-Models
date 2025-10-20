@@ -1,0 +1,74 @@
+[run]
+# Coverage.py configuration file
+
+# Source files to measure
+source = .
+omit =
+    */tests/*
+    */test_*.py
+    */__pycache__/*
+    */venv/*
+    */env/*
+    */.venv/*
+    setup.py
+    */migrations/*
+    */config/*
+
+# Enable branch coverage
+branch = True
+
+# Parallel execution support
+parallel = True
+
+[report]
+# Reporting configuration
+
+# Exclude lines from coverage
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain about missing debug-only code
+    def __repr__
+    if self\.debug
+
+    # Don't complain if tests don't hit defensive assertion code
+    raise AssertionError
+    raise NotImplementedError
+
+    # Don't complain if non-runnable code isn't run
+    if 0:
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:
+
+    # Don't complain about abstract methods
+    @(abc\.)?abstractmethod
+
+# Ignore errors when finding source files
+ignore_errors = True
+
+# Precision for coverage percentages
+precision = 2
+
+# Show missing line numbers
+show_missing = True
+
+# Skip covered files in report
+skip_covered = False
+
+# Sort report by coverage percentage
+sort = Cover
+
+[html]
+# HTML report configuration
+directory = htmlcov
+title = Slack Foundation Models Test Coverage
+
+[xml]
+# XML report configuration (for CI/CD tools)
+output = coverage.xml
+
+[json]
+# JSON report configuration
+output = coverage.json
+pretty_print = True
