@@ -1,0 +1,143 @@
+# Databricks App Configuration
+# This file configures the deployment of the Slack Bot as a Databricks App
+
+name: databricks-slack-bot
+version: 1.0.0
+description: "Slack Bot powered by Databricks Foundation Models with web dashboard"
+
+# Runtime configuration
+runtime:
+  python: "3.11"
+
+# App entry point
+command:
+  - "python"
+  - "app_fastapi.py"
+
+# Environment variables (secrets will be pulled from Databricks scope)
+env:
+  # Port for the FastAPI server
+  PORT: "8000"
+
+  # Databricks configuration - using workspace defaults
+  DATABRICKS_HOST: "${DATABRICKS_HOST:-https://e2-demo-field-eng.cloud.databricks.com}"
+
+  # Secret scope configuration
+  # The app will read secrets from this Databricks scope
+  DATABRICKS_SECRET_SCOPE: "${DATABRICKS_SECRET_SCOPE:-slack-bot-secrets}"
+
+  # Optional: Override individual secrets from environment
+  # These will be used if DATABRICKS_SECRET_SCOPE is not set
+  DATABRICKS_TOKEN: "${DATABRICKS_TOKEN}"
+  SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+  SLACK_SIGNING_SECRET: "${SLACK_SIGNING_SECRET}"
+
+# Resources configuration
+resources:
+  # CPU and memory limits
+  cpu: 2
+  memory: "4Gi"
+
+  # Autoscaling configuration
+  instances:
+    min: 1
+    max: 3
+    target_cpu_utilization: 70
+
+# Networking configuration
+networking:
+  # Expose port for web interface and API
+  ingress:
+    enabled: true
+    port: 8000
+    path_prefix: "/"
+
+  # Health check configuration
+  health_check:
+    path: "/health"
+    interval: 30
+    timeout: 10
+    failure_threshold: 3
+
+# Secrets configuration
+# These secrets should be stored in Databricks scope
+secrets:
+  # Create these in Databricks CLI or UI:
+  # databricks secrets create-scope --scope slack-bot-secrets
+  # databricks secrets put-secret --scope slack-bot-secrets --key databricks-token
+  # databricks secrets put-secret --scope slack-bot-secrets --key slack-bot-token
+  # databricks secrets put-secret --scope slack-bot-secrets --key slack-signing-secret
+  required:
+    - name: databricks-token
+      description: "Databricks personal access token"
+      scope: "${DATABRICKS_SECRET_SCOPE}"
+
+    - name: slack-bot-token
+      description: "Slack bot user OAuth token (xoxb-...)"
+      scope: "${DATABRICKS_SECRET_SCOPE}"
+
+    - name: slack-signing-secret
+      description: "Slack app signing secret for webhook verification"
+      scope: "${DATABRICKS_SECRET_SCOPE}"
+
+# Dependencies
+dependencies:
+  pip:
+    - fastapi==0.104.1
+    - uvicorn==0.24.0
+    - openai==1.3.0
+    - httpx==0.25.0
+    - python-dotenv==1.0.0
+    - tiktoken==0.5.1
+    - pydantic==2.4.2
+
+# Monitoring and logging
+monitoring:
+  # Enable application metrics
+  metrics:
+    enabled: true
+    path: "/metrics"
+
+  # Logging configuration
+  logging:
+    level: "INFO"
+    format: "json"
+
+# Deployment configuration
+deployment:
+  # Deployment strategy
+  strategy: "RollingUpdate"
+
+  # Readiness probe
+  readiness_probe:
+    http_get:
+      path: "/health"
+      port: 8000
+    initial_delay_seconds: 10
+    period_seconds: 10
+
+  # Liveness probe
+  liveness_probe:
+    http_get:
+      path: "/health"
+      port: 8000
+    initial_delay_seconds: 30
+    period_seconds: 30
+
+# Databricks-specific configuration
+databricks:
+  # Workspace configuration
+  workspace:
+    # Use current workspace by default
+    host: "${DATABRICKS_HOST}"
+
+  # Permissions
+  permissions:
+    - level: "CAN_USE"
+      group_name: "users"
+
+  # Tags for resource management
+  tags:
+    team: "platform"
+    project: "slack-integration"
+    environment: "${ENVIRONMENT:-production}"
