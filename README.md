@@ -1,5 +1,12 @@
 # Slack with Foundation Models
 
+[![Tests](https://github.com/honnuanand/Slack-with-Foundation-Models/actions/workflows/tests.yml/badge.svg)](https://github.com/honnuanand/Slack-with-Foundation-Models/actions/workflows/tests.yml)
+[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![OpenAI Compatible](https://img.shields.io/badge/OpenAI-Compatible-green)](https://platform.openai.com/docs)
+[![Databricks](https://img.shields.io/badge/Databricks-Ready-orange)](https://databricks.com)
+[![Slack](https://img.shields.io/badge/Slack-Bot-4A154B?logo=slack)](https://api.slack.com)
+
 Connect Slack to Databricks and other LLM providers that are compatible with the OpenAI API format for connectivity.
 
 This project provides both a **Slack bot** and **CLI interface** to chat with Foundation Models from providers like Databricks, OpenAI, and any other service that supports the OpenAI-compatible API format.
