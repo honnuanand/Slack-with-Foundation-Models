@@ -1,8 +1,12 @@
 import os
 import logging
+from dotenv import load_dotenv
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 from openai import OpenAI
+
+# Load environment variables
+load_dotenv()
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -17,14 +21,15 @@ openai_client = OpenAI(
     base_url=f"{os.environ.get('DATABRICKS_HOST')}/serving-endpoints"
 )
 
-# Available Databricks Foundation Models
+# Available Databricks Foundation Models (FE VM workspace)
 AVAILABLE_MODELS = {
-    "maverick": "databricks-meta-llama-3-1-70b-instruct",
-    "llama-70b": "databricks-meta-llama-3-1-70b-instruct",
+    "maverick": "databricks-llama-4-maverick",
+    "llama-70b": "databricks-meta-llama-3-3-70b-instruct",
     "llama-405b": "databricks-meta-llama-3-1-405b-instruct",
-    "dbrx": "databricks-dbrx-instruct",
-    "mixtral": "databricks-mixtral-8x7b-instruct",
-    "mpt": "databricks-mpt-30b-instruct",
+    "llama-8b": "databricks-meta-llama-3-1-8b-instruct",
+    "claude-sonnet": "databricks-claude-sonnet-4-5",
+    "claude-opus": "databricks-claude-opus-4-1",
+    "gpt-120b": "databricks-gpt-oss-120b",
 }
 
 # Store conversation history per thread
@@ -70,17 +75,31 @@ def handle_app_mentions(event, say, client):
 
         # Show available models if requested
         if "models" in user_message.lower() or "help" in user_message.lower():
-            models_list = "\n".join([f"• `{key}` - {model_id}" for key, model_id in AVAILABLE_MODELS.items()])
-            help_text = f"""*Available Databricks Foundation Models:*
+            # Get current model for this thread
+            current_model_id = conversation_history.get(thread_ts, {}).get("model", AVAILABLE_MODELS["maverick"])
+            current_model_name = next((k for k, v in AVAILABLE_MODELS.items() if v == current_model_id), "maverick")
+
+            models_list = "\n".join([
+                f"• `{key}` → *{model_id.replace('databricks-', '')}*"
+                for key, model_id in AVAILABLE_MODELS.items()
+            ])
+            help_text = f"""🤖 *Databricks Foundation Models Bot*
+
+*Connection Status:* ✅ Connected to Databricks FE VM
+*Endpoint:* `{os.environ.get('DATABRICKS_HOST')}`
+
+*Available Models:*
 {models_list}
+
+*Currently Selected:* `{current_model_name}` → *{current_model_id}*
 
 *Commands:*
 • Mention me with your question to chat
-• Say "use [model-name]" to switch models
+• Say "use [model-name]" to switch models (e.g., "use claude-opus")
 • Say "help" or "models" to see this message
 • Say "clear" to reset conversation history
 
-Currently using: *Maverick* (Llama 3.1 70B)"""
+_Using OpenAI-compatible API format for all models_"""
             say(help_text, thread_ts=thread_ts)
             return
 
@@ -120,8 +139,12 @@ Currently using: *Maverick* (Llama 3.1 70B)"""
             "content": response
         })
 
-        # Send response
-        say(response, thread_ts=thread_ts)
+        # Get model name for display
+        model_name = next((k for k, v in AVAILABLE_MODELS.items() if v == model_endpoint), "unknown")
+
+        # Send response with model info
+        response_with_info = f"{response}\n\n_—Powered by Databricks `{model_name}` ({model_endpoint})_"
+        say(response_with_info, thread_ts=thread_ts)
 
     except Exception as e:
         logger.error(f"Error handling mention: {e}")
