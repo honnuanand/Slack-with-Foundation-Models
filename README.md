@@ -9,6 +9,8 @@
 
 Connect Slack to Databricks and other LLM providers that are compatible with the OpenAI API format for connectivity.
 
+![PromptBot Dashboard](assets/dashboard-screenshot.jpg)
+
 This project provides both a **Slack bot** and **CLI interface** to chat with Foundation Models from providers like Databricks, OpenAI, and any other service that supports the OpenAI-compatible API format.
 
 ## 🎯 What This Does
