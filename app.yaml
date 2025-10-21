@@ -20,7 +20,7 @@ env:
   PORT: "8000"
 
   # Databricks configuration - using workspace defaults
-  DATABRICKS_HOST: "${DATABRICKS_HOST:-https://e2-demo-field-eng.cloud.databricks.com}"
+  DATABRICKS_HOST: "https://fe-vm-leaps-fe.cloud.databricks.com"
 
   # Secret scope configuration
   # The app will read secrets from this Databricks scope
@@ -129,7 +129,7 @@ databricks:
   # Workspace configuration
   workspace:
     # Use current workspace by default
-    host: "${DATABRICKS_HOST}"
+    host: "https://fe-vm-leaps-fe.cloud.databricks.com"
 
   # Permissions
   permissions:

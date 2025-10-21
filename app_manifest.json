@@ -1,0 +1,31 @@
+{
+  "name": "slack-foundation-bot",
+  "description": "Slack bot powered by Databricks Foundation Models with web dashboard",
+  "source_code_path": "/FileStore/apps/slack-foundation-bot",
+  "config": {
+    "command": ["python", "app_fastapi.py"],
+    "env": {
+      "PORT": "8000",
+      "DATABRICKS_HOST": "https://fe-vm-leaps-fe.cloud.databricks.com",
+      "DATABRICKS_SECRET_SCOPE": "slack-bot-secrets",
+      "PYTHONPATH": "/FileStore/apps/slack-foundation-bot"
+    }
+  },
+  "resources": {
+    "job_cluster": {
+      "job_cluster_key": "app-cluster",
+      "new_cluster": {
+        "spark_version": "14.3.x-scala2.12",
+        "node_type_id": "i3.xlarge",
+        "num_workers": 0,
+        "spark_conf": {
+          "spark.databricks.cluster.profile": "singleNode",
+          "spark.master": "local[*]"
+        },
+        "custom_tags": {
+          "ResourceClass": "SingleNode"
+        }
+      }
+    }
+  }
+}
