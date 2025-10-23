@@ -1,265 +1,199 @@
-# Slack with Foundation Models
+# Slack Bot with Databricks Foundation Models
 
 [![Tests](https://github.com/honnuanand/Slack-with-Foundation-Models/actions/workflows/tests.yml/badge.svg)](https://github.com/honnuanand/Slack-with-Foundation-Models/actions/workflows/tests.yml)
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![OpenAI Compatible](https://img.shields.io/badge/OpenAI-Compatible-green)](https://platform.openai.com/docs)
-[![Databricks](https://img.shields.io/badge/Databricks-Ready-orange)](https://databricks.com)
-[![Slack](https://img.shields.io/badge/Slack-Bot-4A154B?logo=slack)](https://api.slack.com)
+[![Databricks](https://img.shields.io/badge/Databricks-Apps-orange)](https://databricks.com)
+[![Slack](https://img.shields.io/badge/Slack-Socket_Mode-4A154B?logo=slack)](https://api.slack.com)
 
-Connect Slack to Databricks and other LLM providers that are compatible with the OpenAI API format for connectivity.
+Production-ready Slack bot powered by Databricks Foundation Models with real-time metrics dashboard.
 
 ![PromptBot Dashboard](assets/dashboard-screenshot.jpg)
 
-This project provides both a **Slack bot** and **CLI interface** to chat with Foundation Models from providers like Databricks, OpenAI, and any other service that supports the OpenAI-compatible API format.
-
 ## 🎯 What This Does
 
-- **Slack Integration**: Chat with Foundation Models directly in Slack using Bolt for Python
-- **CLI Interface**: Terminal-based chat interface for quick testing and development
-- **OpenAI-Compatible**: Uses the standard OpenAI API format, making it easy to switch between providers
-- **Flexible Provider Support**: Works with Databricks Foundation Models, OpenAI, or any OpenAI-compatible service
-
-## 🚀 Quick Start
-
-Choose your path:
-
-1. **CLI Only** → See [QUICKSTART.md](QUICKSTART.md) or [CLI_README.md](CLI_README.md)
-2. **Slack Bot with Databricks** → Continue below
-3. **Testing with OpenAI** → See [TESTING_WITH_OPENAI.md](TESTING_WITH_OPENAI.md)
-4. **Not sure which file to use?** → See [WHICH_FILE_TO_USE.md](WHICH_FILE_TO_USE.md)
+- **Slack Integration**: Chat with 7 Databricks Foundation Models directly in Slack
+- **Real-time Dashboard**: Web dashboard with metrics, model usage, and system information
+- **Socket Mode**: Instant responses via WebSocket connection
+- **Model Switching**: Users can switch between models on-the-fly
+- **Conversation Memory**: Maintains context per Slack thread
+- **Production Deployment**: Runs on Databricks Apps with auto-scaling
 
 ## ✨ Features
 
-- 🤖 **Multiple Providers**: Databricks, OpenAI, or any OpenAI-compatible LLM service
-- 🔄 **Model Switching**: Switch between different models on the fly
-- 💬 **Conversation History**: Maintains context across multiple turns
-- ⚡ **Real-time Responses**: Fast, streaming responses
-- 🎨 **Color-Coded Output**: Enhanced CLI experience with color formatting
-- 📱 **Slack Integration**: Full Slack bot with mentions, DMs, and slash commands
-- 🔌 **Standard API**: Uses OpenAI's Chat Completions API format
+### For End Users
+- 🤖 **7 Foundation Models** - Llama 4 Maverick, Claude Opus 4.1, Claude Sonnet 4.5, Llama 405B, Llama 70B, Llama 8B, GPT OSS 120B
+- 💬 **Context-Aware Conversations** - Remembers conversation history per thread
+- 🔄 **Easy Model Switching** - Change models with simple commands
+- ⚡ **Instant Responses** - Socket Mode for real-time communication
 
-## 🛠️ Available Implementations
+### For Administrators
+- 📊 **Metrics Dashboard** - Track requests, tokens, users, and model usage
+- 🎨 **Beautiful UI** - Left navigation panel for easy access to all sections
+- 📈 **Usage Analytics** - Per-model statistics and trends
+- 🔧 **System Information** - Complete deployment and configuration details
+- 📚 **Built-in Documentation** - User guide and help directly in dashboard
 
-| File | Interface | Providers | Best For |
-|------|-----------|-----------|----------|
-| `chat_cli.py` | Terminal | Databricks only | Quick local testing with Databricks |
-| `chat_cli_openai.py` | Terminal | Databricks OR OpenAI | Flexible development/testing |
-| `app.py` | Slack | Databricks only | Production Slack bot with Databricks |
-| `app_openai.py` | Slack | Databricks OR OpenAI | Testing Slack bot without Databricks |
+## 🚀 Quick Start
 
-## 📋 Setup - Slack Bot with Databricks
+### Prerequisites
+- Databricks workspace with Foundation Models enabled
+- Slack workspace with admin access
+- Personal Access Token (PAT) for Databricks
 
-### 1. Install Dependencies
+### 1. Set Up Slack App
 
+See detailed instructions in [SLACK_SETUP_GUIDE.md](SLACK_SETUP_GUIDE.md)
+
+**Quick version:**
+1. Create Slack app at https://api.slack.com/apps
+2. Enable Socket Mode and create App-Level Token
+3. Add OAuth scopes: `app_mentions:read`, `chat:write`, `im:history`, `im:read`, `im:write`
+4. Subscribe to events: `app_mention`, `message.im`
+5. Install app to workspace
+
+### 2. Deploy to Databricks Apps
+
+See detailed instructions in [DATABRICKS_APP_DEPLOYMENT.md](DATABRICKS_APP_DEPLOYMENT.md)
+
+**Quick version:**
 ```bash
-# Create virtual environment (recommended)
-python3 -m venv venv
-source venv/bin/activate
+# Update app.yml with your tokens
+vim app.yml
 
-# Install packages
-pip install -r requirements.txt
+# Upload to Databricks
+databricks workspace import-dir . /Workspace/Users/your.email@company.com/apps/slack-bot
+
+# Create and deploy app
+databricks apps create slack-foundation-bot
+databricks apps deploy slack-foundation-bot \
+  --source-code-path /Workspace/Users/your.email@company.com/apps/slack-bot \
+  --mode SNAPSHOT
 ```
 
-### 2. Create a Slack App
+### 3. Use the Bot!
 
-1. Go to [https://api.slack.com/apps](https://api.slack.com/apps)
-2. Click "Create New App" → "From scratch"
-3. Name your app (e.g., "AI Assistant")
-4. Select your workspace
-
-### 3. Configure Slack App
-
-#### Bot Token Scopes
-Add these OAuth scopes under "OAuth & Permissions":
-- `app_mentions:read`
-- `chat:write`
-- `im:history`
-- `im:read`
-- `im:write`
-- `channels:history`
-- `groups:history`
-- `mpim:history`
-
-#### Event Subscriptions
-Enable events and subscribe to:
-- `app_mention`
-- `message.im`
-
-#### Socket Mode
-1. Enable Socket Mode under "Socket Mode"
-2. Generate an App-Level Token with `connections:write` scope
-
-#### Install App
-Install the app to your workspace under "Install App"
-
-### 4. Configure Environment Variables
-
-```bash
-cp .env.example .env
+**In Slack channels:**
+```
+@PromptBot What is machine learning?
+@PromptBot use claude-opus
+@PromptBot Explain transformers in AI
 ```
 
-Edit `.env` with your credentials:
-```env
-# For Databricks
-MODE=databricks
-DATABRICKS_HOST=https://your-workspace.cloud.databricks.com
-DATABRICKS_TOKEN=dapi...
-
-# For Slack
-SLACK_BOT_TOKEN=xoxb-your-bot-token
-SLACK_APP_TOKEN=xapp-your-app-token
+**In direct messages:**
+```
+Just type your question!
 ```
 
-**Getting Databricks Credentials:**
-1. **Host**: Your Databricks workspace URL
-2. **Token**: Generate from User Settings → Developer → Access Tokens
+**View Dashboard:**
+Visit your app URL (provided after deployment) to see metrics and analytics.
 
-### 5. Run the Slack Bot
+## 📊 Available Models
 
-```bash
-source venv/bin/activate
-python app.py
-```
-
-You should see:
-```
-⚡️ Bolt app is running with Databricks Foundation Models!
-```
-
-## 💡 Usage
-
-### In Slack Channels
-Mention the bot with your question:
-```
-@AI Assistant What is machine learning?
-```
-
-### In Direct Messages
-Just type your question:
-```
-Explain transformers in AI
-```
-
-### Commands
-- **Get help**: Say "help" or "models"
-- **Switch models**: Say "use llama-70b" or "use claude-sonnet"
-- **Clear history**: Say "clear" to reset conversation context
-
-## 🔧 Testing with OpenAI Instead
-
-Want to test the Slack bot without Databricks access? You can use OpenAI instead!
-
-1. Get an OpenAI API key from https://platform.openai.com/api-keys
-2. Update your `.env`:
-   ```env
-   MODE=openai
-   OPENAI_API_KEY=sk-your-key-here
-   ```
-3. Run: `python app_openai.py`
-
-See [TESTING_WITH_OPENAI.md](TESTING_WITH_OPENAI.md) for complete instructions.
-
-## 🏗️ How It Works - The OpenAI API Format
-
-All implementations use the **OpenAI Chat Completions API** format:
-
-```python
-from openai import OpenAI
-
-# For Databricks
-client = OpenAI(
-    api_key=DATABRICKS_TOKEN,
-    base_url=f"{DATABRICKS_HOST}/serving-endpoints"
-)
-
-# For OpenAI
-client = OpenAI(
-    api_key=OPENAI_API_KEY
-)
-
-# Same API call for both!
-response = client.chat.completions.create(
-    model="model-id",
-    messages=[{"role": "user", "content": "Hello"}],
-    max_tokens=1000,
-    temperature=0.7
-)
-```
-
-**Same syntax, different endpoint** - that's the power of the OpenAI-compatible API format!
-
-## 📚 Available Models
-
-### Databricks Foundation Models
-- Llama 4 Maverick
-- Llama 3.3 70B Instruct
-- Llama 3.1 405B Instruct
-- Claude Sonnet 4.5
-- Claude Opus 4.1
-- GPT OSS 120B
-- And more...
-
-### OpenAI Models
-- GPT-4o
-- GPT-4o Mini
-- GPT-4 Turbo
-- GPT-3.5 Turbo
-
-*The actual available models depend on your workspace/account configuration*
+| Command | Model | Best For |
+|---------|-------|----------|
+| `use maverick` | Llama 4 Maverick | Latest, general purpose |
+| `use claude-opus` | Claude Opus 4.1 | Complex reasoning, detailed analysis |
+| `use claude-sonnet` | Claude Sonnet 4.5 | Balanced performance, speed |
+| `use llama-405b` | Llama 3.1 405B | Highest accuracy, complex tasks |
+| `use llama-70b` | Llama 3.3 70B | Fast, accurate responses |
+| `use llama-8b` | Llama 3.1 8B | Quick, simple tasks |
+| `use gpt-120b` | GPT OSS 120B | GPT-style responses |
 
 ## 📂 Project Structure
 
 ```
-Slack-with-Foundation-Models/
-├── app.py                    # Slack bot (Databricks only)
-├── app_openai.py             # Slack bot (flexible provider)
-├── chat_cli.py               # CLI (Databricks only)
-├── chat_cli_openai.py        # CLI (flexible provider)
-├── example_usage.py          # Simple API example
-├── requirements.txt          # All dependencies
-├── requirements-cli.txt      # CLI-only dependencies
-├── .env.example              # Environment template
-├── README.md                 # This file
-├── CLI_README.md             # CLI-specific documentation
-├── QUICKSTART.md             # Quick start guide
-├── TESTING_WITH_OPENAI.md    # OpenAI testing guide
-└── WHICH_FILE_TO_USE.md      # Decision guide
+slack-foundation-bot/
+├── app.py                           # Main application (Socket Mode + Dashboard)
+├── app.yml                          # Databricks Apps configuration
+├── requirements.txt                 # Python dependencies
+├── README.md                        # This file
+├── DATABRICKS_APP_DEPLOYMENT.md    # Deployment guide
+├── SLACK_SETUP_GUIDE.md            # Slack app setup
+├── SERVICE_PRINCIPAL_INVESTIGATION.md  # Auth research findings
+├── CHANGELOG.md                     # Version history
+│
+└── archive/                         # Historical/experimental files
+    ├── experimental/                # Old development versions
+    ├── deployed-backups/            # Deployment history
+    └── docs/                        # Archived documentation
 ```
+
+## 🔧 Technical Details
+
+### Architecture
+- **FastAPI** - Web server for dashboard
+- **Slack Bolt** - Socket Mode handler for Slack
+- **Threading** - Runs FastAPI and Socket Mode concurrently
+- **OpenAI-compatible API** - Uses standard OpenAI format for model calls
+
+### Authentication
+- **Databricks**: Personal Access Token (PAT) required
+- **Service Principal**: Tested but NOT supported for foundation models ([details](SERVICE_PRINCIPAL_INVESTIGATION.md))
+- **Slack**: Bot Token + App-Level Token
+
+### Deployment
+- **Platform**: Databricks Apps (serverless)
+- **Scaling**: Auto-scaling (1-3 instances)
+- **Monitoring**: Built-in metrics dashboard
+- **Updates**: Deploy new code via Databricks CLI
 
 ## 🔍 Troubleshooting
 
-### Slack Bot Issues
-- **Bot doesn't respond**: Check Socket Mode is enabled and bot is invited to channel
-- **Permission errors**: Review bot token scopes and reinstall app
-- **Authentication errors**: Verify SLACK_BOT_TOKEN and SLACK_APP_TOKEN
+### Bot Not Responding
+1. Check Socket Mode is enabled in Slack app settings
+2. Verify tokens are correct in app.yml
+3. Check deployment status: `databricks apps get slack-foundation-bot`
 
-### Databricks Issues
-- **Invalid credentials**: Check DATABRICKS_HOST and DATABRICKS_TOKEN
-- **Model not found**: Verify the model endpoint exists in your workspace
-- **Access denied**: Ensure workspace has Foundation Models enabled
+### Dashboard Not Accessible
+- Dashboard requires Databricks OAuth authentication
+- Socket Mode bot works independently of dashboard access
 
-### OpenAI Issues
-- **Invalid API key**: Verify key at https://platform.openai.com/api-keys
-- **Rate limits**: Check your usage limits and billing
+### Model Errors
+- Verify model endpoints exist in your workspace
+- Check Databricks token has proper permissions
+- See [Databricks Foundation Models docs](https://docs.databricks.com/en/machine-learning/foundation-models/index.html)
 
-## 🎓 Learn More
+## 📚 Documentation
 
-- [Databricks Foundation Models Documentation](https://docs.databricks.com/en/machine-learning/foundation-models/index.html)
-- [OpenAI API Documentation](https://platform.openai.com/docs/api-reference)
-- [Slack Bolt for Python](https://slack.dev/bolt-python/)
+- **[DATABRICKS_APP_DEPLOYMENT.md](DATABRICKS_APP_DEPLOYMENT.md)** - Complete deployment guide
+- **[SLACK_SETUP_GUIDE.md](SLACK_SETUP_GUIDE.md)** - Slack app configuration
+- **[SERVICE_PRINCIPAL_INVESTIGATION.md](SERVICE_PRINCIPAL_INVESTIGATION.md)** - Authentication research findings
+- **[CHANGELOG.md](CHANGELOG.md)** - Version history and deployment IDs
+
+### Archived Documentation
+Older experimental code and documentation has been archived in `archive/` directory:
+- **archive/experimental/** - CLI tools and development versions
+- **archive/deployed-backups/** - Previous deployment snapshots
+- **archive/docs/** - Archived guides (OpenAI testing, quickstarts, etc.)
+
+## 🎓 Key Learnings
+
+### Service Principal Authentication
+We thoroughly investigated using Databricks Apps service principal for authentication instead of personal access tokens. **Result**: Service principal tokens work for general Databricks APIs but are **NOT accepted** by foundation model serving endpoints.
+
+**See [SERVICE_PRINCIPAL_INVESTIGATION.md](SERVICE_PRINCIPAL_INVESTIGATION.md) for full details.**
+
+**Recommendation**: Use a dedicated service account user's PAT instead of personal tokens for better security and maintainability.
+
+## 🤝 Contributing
+
+This is a production-ready reference implementation demonstrating:
+- Databricks Apps deployment
+- Socket Mode Slack integration
+- Foundation Models usage
+- Real-time dashboards
+- Authentication best practices
+
+Feel free to use this as a template for your own Slack bots!
 
 ## 📝 License
 
 MIT
 
-## 🤝 Contributing
+## 🔗 Links
 
-Contributions welcome! This project demonstrates how to:
-- Build Slack bots with Foundation Models
-- Use OpenAI-compatible APIs
-- Switch between different LLM providers
-- Maintain conversation context
-- Handle streaming responses
-
-Feel free to extend it with additional providers or features!
+- [Databricks Foundation Models](https://docs.databricks.com/en/machine-learning/foundation-models/index.html)
+- [Databricks Apps Documentation](https://docs.databricks.com/en/dev-tools/apps/index.html)
+- [Slack Bolt for Python](https://slack.dev/bolt-python/)
+- [Socket Mode Documentation](https://api.slack.com/apis/connections/socket)

@@ -45,3 +45,6 @@ Thumbs.db
 
 # Databricks
 .databrickscfg
+
+# Archive folder - old/experimental files
+archive/
